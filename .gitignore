@@ -310,5 +310,3 @@ TSWLatexianTemp*
 *~[0-9]*
 
 .idea
-*.xml
-*.iml
