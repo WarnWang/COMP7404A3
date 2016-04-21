@@ -42,6 +42,7 @@ class ValueEstimationAgent(Agent):
         gamma    - discount factor
         numTraining - number of training episodes, i.e. no learning after these many episodes
         """
+        Agent.__init__(self)
         self.alpha = float(alpha)
         self.epsilon = float(epsilon)
         self.discount = float(gamma)
