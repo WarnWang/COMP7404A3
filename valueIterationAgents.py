@@ -57,29 +57,14 @@ class ValueIterationAgent(ValueEstimationAgent):
         "*** YOUR CODE HERE ***"
         all_states = self.mdp.getStates()
 
-        # Init all the state values, the first iteration
-        # terminal_state = []
-        # for state in all_states:
-        #     if self.mdp.isTerminal(state=state):
-        #         x, y = state
-        #         self.values[state] = self.mdp.grid[x][y]
-        #         terminal_state.append(state)
-        #     else:
-        #         self.values[state] = 0.0
-
-        # Do the calculation
-        for i in range(0, iterations):
+        # Do the iteration calculation
+        for i in range(iterations):
             new_count = self.values.copy()
             for state in all_states:
                 action = self.computeActionFromValues(state=state)
                 if action is not None:
                     new_count[state] = self.computeQValueFromValues(state, action)
             self.values = new_count
-
-        # Set the grid to the calculated values
-        # for state in self.values:
-        #     x, y = state
-        #     self.mdp.grid[x][y] = self.values[state]
 
     def getValue(self, state):
         """
