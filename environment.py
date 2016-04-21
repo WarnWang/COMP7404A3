@@ -15,13 +15,13 @@
 
 #!/usr/bin/python
 
-class Environment:
+class Environment(object):
 
     def getCurrentState(self):
         """
         Returns the current state of enviornment
         """
-        abstract
+        pass
 
     def getPossibleActions(self, state):
         """
@@ -30,7 +30,7 @@ class Environment:
           return the empty list if we are in
           a terminal state.
         """
-        abstract
+        pass
 
     def doAction(self, action):
         """
@@ -39,13 +39,13 @@ class Environment:
 
           Returns a (reward, nextState) pair
         """
-        abstract
+        pass
 
     def reset(self):
         """
           Resets the current state to the start state
         """
-        abstract
+        pass
 
     def isTerminal(self):
         """
@@ -54,4 +54,4 @@ class Environment:
         """
         state = self.getCurrentState()
         actions = self.getPossibleActions(state)
-        return len(actions) == 0
+        return not len(actions)

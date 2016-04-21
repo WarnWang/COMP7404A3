@@ -13,9 +13,15 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
-import mdp, util
+import util
 
 from learningAgents import ValueEstimationAgent
+
+WEST = 'west'
+NORTH = 'north'
+SOUTH = 'south'
+EAST = 'east'
+EXIT = 'exit'
 
 
 class ValueIterationAgent(ValueEstimationAgent):
@@ -41,7 +47,7 @@ class ValueIterationAgent(ValueEstimationAgent):
               mdp.getReward(state, action, nextState)
               mdp.isTerminal(state)
         """
-        ValueEstimationAgent.__init__(self, gamma=discount)
+        ValueEstimationAgent.__init__(self, gamma=discount, numTraining=iterations)
         self.mdp = mdp
         self.discount = discount
         self.iterations = iterations
@@ -49,6 +55,31 @@ class ValueIterationAgent(ValueEstimationAgent):
 
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
+        all_states = self.mdp.getStates()
+
+        # Init all the state values, the first iteration
+        # terminal_state = []
+        # for state in all_states:
+        #     if self.mdp.isTerminal(state=state):
+        #         x, y = state
+        #         self.values[state] = self.mdp.grid[x][y]
+        #         terminal_state.append(state)
+        #     else:
+        #         self.values[state] = 0.0
+
+        # Do the calculation
+        for i in range(0, iterations):
+            new_count = self.values.copy()
+            for state in all_states:
+                action = self.computeActionFromValues(state=state)
+                if action is not None:
+                    new_count[state] = self.computeQValueFromValues(state, action)
+            self.values = new_count
+
+        # Set the grid to the calculated values
+        # for state in self.values:
+        #     x, y = state
+        #     self.mdp.grid[x][y] = self.values[state]
 
     def getValue(self, state):
         """
@@ -62,7 +93,12 @@ class ValueIterationAgent(ValueEstimationAgent):
           value function stored in self.values.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        tran_states_probability = self.mdp.getTransitionStatesAndProbs(state=state, action=action)
+        q_value = 0
+        for next_state, probability in tran_states_probability:
+            reward = self.mdp.getReward(state=state, action=action, nextState=next_state)
+            q_value += probability * (reward + self.discount * self.getValue(next_state))
+        return q_value
 
     def computeActionFromValues(self, state):
         """
@@ -74,7 +110,15 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        actions = self.mdp.getPossibleActions(state)
+        best_action = None
+        best_q_value = float('-inf')
+        for action in actions:
+            q_value = self.computeQValueFromValues(state=state, action=action)
+            if q_value > best_q_value:
+                best_action = action
+                best_q_value = q_value
+        return best_action
 
     def getPolicy(self, state):
         return self.computeActionFromValues(state)

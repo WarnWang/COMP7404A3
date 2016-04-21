@@ -28,7 +28,8 @@ class Gridworld(mdp.MarkovDecisionProcess):
 
     def __init__(self, grid):
         # layout
-        if type(grid) == type([]): grid = makeGrid(grid)
+        if isinstance(grid, list):
+            grid = makeGrid(grid)
         self.grid = grid
 
         # parameters
@@ -62,7 +63,7 @@ class Gridworld(mdp.MarkovDecisionProcess):
         if state == self.grid.terminalState:
             return ()
         x, y = state
-        if type(self.grid[x][y]) == int:
+        if isinstance(self.grid[x][y], int):
             return ('exit',)
         return ('north', 'west', 'south', 'east')
 
@@ -91,7 +92,7 @@ class Gridworld(mdp.MarkovDecisionProcess):
             return 0.0
         x, y = state
         cell = self.grid[x][y]
-        if type(cell) == int or type(cell) == float:
+        if isinstance(cell, int) or isinstance(cell, float):
             return cell
         return self.livingReward
 
@@ -345,7 +346,8 @@ def getUserAction(state, actionFunction):
     return action
 
 
-def printString(x): print x
+def printString(x):
+    print x
 
 
 def runEpisode(agent, environment, discount, decision, display, message, pause, episode):

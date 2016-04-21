@@ -15,26 +15,26 @@
 
 import random
 
-class MarkovDecisionProcess:
+class MarkovDecisionProcess(object):
 
     def getStates(self):
         """
         Return a list of all states in the MDP.
         Not generally possible for large MDPs.
         """
-        abstract
+        pass
 
     def getStartState(self):
         """
         Return the start state of the MDP.
         """
-        abstract
+        pass
 
     def getPossibleActions(self, state):
         """
         Return list of possible actions from 'state'.
         """
-        abstract
+        pass
 
     def getTransitionStatesAndProbs(self, state, action):
         """
@@ -47,7 +47,7 @@ class MarkovDecisionProcess:
         learning in general, we do not know these
         probabilities nor do we directly model them.
         """
-        abstract
+        pass
 
     def getReward(self, state, action, nextState):
         """
@@ -55,7 +55,7 @@ class MarkovDecisionProcess:
 
         Not available in reinforcement learning.
         """
-        abstract
+        pass
 
     def isTerminal(self, state):
         """
@@ -65,4 +65,4 @@ class MarkovDecisionProcess:
         state as having a self-loop action 'pass' with zero reward; the formulations
         are equivalent.
         """
-        abstract
+        pass
