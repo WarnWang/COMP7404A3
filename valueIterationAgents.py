@@ -14,14 +14,7 @@
 
 
 import util
-
 from learningAgents import ValueEstimationAgent
-
-WEST = 'west'
-NORTH = 'north'
-SOUTH = 'south'
-EAST = 'east'
-EXIT = 'exit'
 
 
 class ValueIterationAgent(ValueEstimationAgent):
