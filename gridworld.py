@@ -563,9 +563,12 @@ if __name__ == '__main__':
         if opts.manual and opts.agent == None:
             displayCallback = lambda state: display.displayNullValues(state)
         else:
-            if opts.agent == 'random': displayCallback = lambda state: display.displayValues(a, state, "CURRENT VALUES")
-            if opts.agent == 'value': displayCallback = lambda state: display.displayValues(a, state, "CURRENT VALUES")
-            if opts.agent == 'q': displayCallback = lambda state: display.displayQValues(a, state, "CURRENT Q-VALUES")
+            if opts.agent == 'random':
+                displayCallback = lambda state: display.displayValues(a, state, "CURRENT VALUES")
+            if opts.agent == 'value':
+                displayCallback = lambda state: display.displayValues(a, state, "CURRENT VALUES")
+            if opts.agent == 'q':
+                displayCallback = lambda state: display.displayQValues(a, state, "CURRENT Q-VALUES")
 
     messageCallback = lambda x: printString(x)
     if opts.quiet:
