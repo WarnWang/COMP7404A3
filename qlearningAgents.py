@@ -19,6 +19,19 @@ from featureExtractors import *
 
 import random, util, math
 
+NEXT_SCORE = "score"
+NEAREST_GHOST_DISTANCE = 'nearest_ghost'
+AVERAGE_GHOST_DISTANCE = 'avg_ghost'
+NEAREST_FOOD_DISTANCE = 'nearest_food'
+FOOD_NUM = 'food_num'
+VALID_ACTION_NUM = 'valid_action_num'
+SCARED_GHOST_DISTANCE = 'ghost_scared_distance'
+TERMINATED_OR_NOT = "is_terminated"
+CURRENT_SCORE = "last_score"
+
+WEIGHT_FEATURES = [NEXT_SCORE, NEAREST_FOOD_DISTANCE, NEAREST_GHOST_DISTANCE, AVERAGE_GHOST_DISTANCE, FOOD_NUM,
+                   VALID_ACTION_NUM, SCARED_GHOST_DISTANCE, TERMINATED_OR_NOT, CURRENT_SCORE]
+
 
 class QLearningAgent(ReinforcementAgent):
     """
@@ -200,14 +213,114 @@ class ApproximateQAgent(PacmanQAgent):
           where * is the dotProduct operator
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        weights = self.getWeights()
+        return self.featExtractor.getFeatures(state, action) * weights
+
+    def get_feature_vector(self, state, action):
+        """
+        Use to get all the features
+        :param state:
+        :param action:
+        :return: the feature vector
+        """
+
+        def get_normalize_data(data):
+            return 1.0 / (1 + math.exp(-data))
+
+        # fill featureVector
+        feature_vector = util.Counter()
+        feature_vector[CURRENT_SCORE] = state.getScore()
+        if state.isWin():
+            feature_vector[TERMINATED_OR_NOT] = 10
+        elif state.isLose():
+            feature_vector[TERMINATED_OR_NOT] = -10
+        elif action is not None:
+
+            # Generate next state
+            next_state = state.generatePacmanSuccessor(action)
+
+            # fill in score
+            feature_vector[NEXT_SCORE] = next_state.getScore()
+
+            if next_state.isWin():
+                feature_vector[TERMINATED_OR_NOT] = 30
+            elif next_state.isLose():
+                feature_vector[TERMINATED_OR_NOT] = -30
+            else:
+                feature_vector[TERMINATED_OR_NOT] = 1
+                feature_vector[VALID_ACTION_NUM] = len(next_state.getLegalPacmanActions())
+
+                # Get some parameters
+                pacman_pos = next_state.getPacmanPosition()
+                ghost_pos = next_state.getGhostPositions()
+                ghost_state = next_state.getGhostStates()
+                food_pos = next_state.getFood()
+                wall_pos = next_state.getWalls()
+
+                # Fill nearest ghost distance and average ghost distance
+                min_distance = float('inf')
+                total_distance = 0
+                total_ghost = 0
+                nearest_scared_distance = None
+                for i in range(len(ghost_pos)):
+                    distance = util.manhattanDistance(pacman_pos, ghost_pos[i])
+                    if ghost_state[i].scaredTimer > 0:
+                        if nearest_scared_distance is None or nearest_scared_distance > distance:
+                            nearest_scared_distance = distance
+                    else:
+                        if distance < min_distance:
+                            min_distance = distance
+                        total_distance += distance
+                        total_ghost += 1
+
+                if total_ghost:
+                    feature_vector[AVERAGE_GHOST_DISTANCE] = -float(total_distance) / total_ghost
+                    feature_vector[NEAREST_GHOST_DISTANCE] = -min_distance
+                if nearest_scared_distance is not None and nearest_scared_distance > 0:
+                    feature_vector[SCARED_GHOST_DISTANCE] = nearest_scared_distance
+
+                # Find the nearest food position
+                pos_to_explore = []
+                explored_pos = set()
+                pos_to_explore.append((pacman_pos, 0))
+                distance = 0
+                while pos_to_explore:
+                    frontier = pos_to_explore.pop(0)
+                    explored_pos.add(frontier[0])
+                    if food_pos[frontier[0][0]][frontier[0][1]]:
+                        distance = frontier[1]
+                        break
+                    else:
+                        successor_pos = [(frontier[0][0] + 1, frontier[0][1]), (frontier[0][0] - 1, frontier[0][1]),
+                                         (frontier[0][0], frontier[0][1] + 1), (frontier[0][0], frontier[0][1] - 1)]
+                        for pos in successor_pos:
+                            if pos[0] < 0 or pos[0] >= food_pos.width or pos[1] < 0 or pos[1] >= food_pos.height:
+                                continue
+                            if not wall_pos[pos[0]][pos[1]] and pos not in explored_pos:
+                                pos_to_explore.append((pos, frontier[1] + 1))
+                feature_vector[NEAREST_FOOD_DISTANCE] = -distance
+                feature_vector[FOOD_NUM] = -len(food_pos.asList())
+
+        for key in feature_vector:
+            feature_vector[key] = get_normalize_data(feature_vector[key])
+
+        return feature_vector
 
     def update(self, state, action, nextState, reward):
         """
            Should update your weights based on transition
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        next_action = self.getAction(nextState)
+        if next_action is None:
+            return
+
+        difference = reward + self.discount * self.getQValue(nextState, next_action) - self.getQValue(state, action)
+        feature_vector = self.featExtractor.getFeatures(state, action)
+        # print feature_vector
+
+        for key in feature_vector:
+            self.weights[key] += self.alpha * difference * feature_vector[key]
 
     def final(self, state):
         "Called at the end of each game."
@@ -218,4 +331,4 @@ class ApproximateQAgent(PacmanQAgent):
         if self.episodesSoFar == self.numTraining:
             # you might want to print your weights here for debugging
             "*** YOUR CODE HERE ***"
-            pass
+            print len(self.weights)
