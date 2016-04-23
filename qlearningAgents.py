@@ -108,6 +108,9 @@ class QLearningAgent(ReinforcementAgent):
             if q_value > max_value:
                 max_value = q_value
                 best_action = [action]
+
+            # As float number is hard to compare, if the difference between the two float is less than 1e-5, I will
+            # regard these two float as same number
             elif abs(q_value - max_value) < 1e-5:
                 best_action.append(action)
 
@@ -222,13 +225,16 @@ class ApproximateQAgent(PacmanQAgent):
         """
         "*** YOUR CODE HERE ***"
         next_action = self.getPolicy(nextState)
+
+        # Some featExtractor can handle none action, but some are not. so I add one try here to handle such case.
         try:
             next_q_value = self.getQValue(nextState, next_action)
         except Exception:
             next_q_value = 0
+
+        # Calculate difference and update weights
         difference = reward + self.discount * next_q_value - self.getQValue(state, action)
         feature_vector = self.featExtractor.getFeatures(state, action)
-
         for key in feature_vector:
             self.weights[key] += self.alpha * difference * feature_vector[key]
 
@@ -241,6 +247,4 @@ class ApproximateQAgent(PacmanQAgent):
         if self.episodesSoFar == self.numTraining:
             # you might want to print your weights here for debugging
             "*** YOUR CODE HERE ***"
-            # print len(self.weights)
-            # print self.weights
             pass
