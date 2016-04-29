@@ -53,10 +53,13 @@ class ValueIterationAgent(ValueEstimationAgent):
         # Do the iteration calculation
         for i in range(iterations):
             new_count = self.values.copy()
+
             for state in all_states:
                 action = self.computeActionFromValues(state=state)
                 if action is not None:
                     new_count[state] = self.computeQValueFromValues(state, action)
+
+            # Update values after one iterations
             self.values = new_count
 
     def getValue(self, state):
@@ -72,6 +75,7 @@ class ValueIterationAgent(ValueEstimationAgent):
         """
         "*** YOUR CODE HERE ***"
         tran_states_probability = self.mdp.getTransitionStatesAndProbs(state=state, action=action)
+
         q_value = 0
         for next_state, probability in tran_states_probability:
             reward = self.mdp.getReward(state=state, action=action, nextState=next_state)
@@ -89,8 +93,12 @@ class ValueIterationAgent(ValueEstimationAgent):
         """
         "*** YOUR CODE HERE ***"
         actions = self.mdp.getPossibleActions(state)
+
+        # if no valid actions, make sure that the returned action is None
         best_action = None
         best_q_value = float('-inf')
+
+        # Search all the valid actions to get the best action
         for action in actions:
             q_value = self.computeQValueFromValues(state=state, action=action)
             if q_value > best_q_value:
