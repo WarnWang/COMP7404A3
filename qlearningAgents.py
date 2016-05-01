@@ -14,6 +14,7 @@
 
 
 import random
+
 import util
 from featureExtractors import *
 
@@ -83,9 +84,12 @@ class QLearningAgent(ReinforcementAgent):
         """
         "*** YOUR CODE HERE ***"
         actions = self.getLegalActions(state)
+
+        # No valid actions
         if not actions:
             return 0.0
 
+        # As we have handled the situation about no valid actions, so we don't need to think about it again here.
         max_q_value = float('-inf')
         for action in actions:
             q_value = self.getQValue(state, action)
