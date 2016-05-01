@@ -4,11 +4,13 @@
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
 \usepackage{titlesec}
+\usepackage{graphicx}
+\usepackage{subfigure}
 
 \titlespacing*{\section}
-{0pt}{2ex plus 1ex minus .2ex}{3ex plus .2ex}
+{0pt}{2ex minus .2ex}{2ex plus .2ex}
 \titlespacing*{\subsection}
-{0pt}{1.5ex plus 1ex minus .2ex}{2ex plus .2ex}
+{0pt}{1ex minus .2ex}{1ex plus .2ex}
 
 \setlength{\parindent}{2em}
 \setlength{\parskip}{0.5em}
@@ -16,6 +18,7 @@
 \title{\vspace{-2cm}Assignment3 Report\vspace{-2ex}}
 \author{Wang Youan (3035237236)\\ MSc in Computer Science, the University of Hong Kong\vspace{-2ex}}
 \date{\today\vspace{-1cm}}
+\graphicspath{{images/}}
 \geometry{left=2cm, right=2cm, top=2cm, bottom=2cm}
 \begin{document}
 	\maketitle
@@ -41,9 +44,29 @@
 	\subsection{BridgeGrid}
 	My answer to this question is \textbf{impossible}.\par
 	In this noiseless world, to achieve the distant exit with +10 needs 5 steps, which means that even if set the epsilon to 0, i.e. a total stochastic world, there is only $ \frac{1}{4}^5 \approx 0.098\% $ chance to reach that cell. With just 50 tries, it is impossible to have enough chance to evaluate the value. There should at least 10000 epsilon total stochastic tries. For a partial random agent (whose epsilon is larger than 0), the chance of learning best policy is much lower.\par
-	This question shows one shortage of Q-learning agent that as it lacks the overview of global environment, it may not find the optimal solutions.
+	This question shows one shortage of Q-learning agent that as it lacks the overview of global environment, it may not find the optimal solutions. 
 	\section{Approximate Q-learning and State Abstraction}
-	\subsection{Pacman}
-	\subsection{ApproximateQAgent}
-	
+	\subsection{Q-learning Agent}
+	Q-learning agent is a bad learner in Pacman, even for middle grid. The reasons are 
+	\begin{itemize}
+		\vspace{-2ex}\item Because of lacking the ability of abstraction, q-learning agent will regard two similar state (e.g. figure~\ref{fig:smilar}, actually these two states are almost the same) as totally different one. (e.g, two states whose only differences are the food number)
+		\begin{figure}[ht]
+			\centering
+			\subfigure[State A]{
+				\centering
+				\includegraphics[width=.4\linewidth]{state_a}
+			}
+			\subfigure[State B]{
+				\centering
+				\includegraphics[width=.4\linewidth]{state_b}
+			}
+			\caption{Two similar states}
+			\label{fig:smilar}
+		\end{figure} 
+		\vspace{-2ex}\item Because of randomness. Q-learning agent makes stochastic action, sometimes it will return some totally unreasonable direction, such as rushing to the Ghost.
+	\end{itemize}
+	\vspace{-2ex}One strong point of Q-learning algorithm is that we don't need any knowledge about the environment. Such type of agent can learn everything from there own actions. However, lacking pre-knowledge is also its shortcoming, which makes Q-learning algorithm not suitable for such type of problems with many similar states and we have some experience. We have to try other methods. 
+	\subsection{Approximate Q-learning Agent}
+	In order to address deficiencies of Q-learning algorithm, we will combine our learning agent with some special knowledge. The biggest difference between the two methods is that approximate Q-leaning agent uses feature-based model instead state-based one in Q-learning agent.\par
+	We can easily solve middleClassic grid with only 50 episodes with proper design feature extractor.
 \end{document}
